@@ -1,4 +1,5 @@
 import 'package:drivers/model/location.dart';
+import 'dart:convert';
 
 class Order {
   String? companyId;
@@ -14,10 +15,10 @@ class Order {
   String? placeId;
   String? driverId;
   String? driverName;
-  DeliveryStatus currentStatus;
+  String currentStatus;
   DateTime deliveryDate;
   String? specialInstructions;
-  Priority priority;
+  String priority;
   Order({
     this.companyId,
     this.orderId,
@@ -34,65 +35,45 @@ class Order {
     required this.currentStatus,
     required this.deliveryDate,
     this.specialInstructions,
-    this.priority = Priority.Medium,
+    this.priority = "Medium",
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    DeliveryStatus? currentStatus;
-    Priority? priority;
-    if (json['currentStatus'] == "Assigned") {
-      currentStatus = DeliveryStatus.Assigned;
-    } else {
-      currentStatus = DeliveryStatus.PathAssigned;
-    }
-
-    if (json['priority'] == "Low") {
-      priority = Priority.Low;
-    } else if (json['priority'] == "Medium") {
-      priority = Priority.Medium;
-    } else {
-      priority = Priority.High;
+    DateTime getDateFromString(String date) {
+      DateTime d = DateTime.parse(date);
+      return d;
     }
 
     return Order(
         address: json['address'],
         cphone: json['cphone'],
         cname: json["cname"],
-        currentStatus: currentStatus,
-        deliveryDate: DateTime.now(),
+        currentStatus: json['currentStatus'],
+        deliveryDate: getDateFromString(json['deliveryDate']),
         specialInstructions: json['specialInstructions'],
         companyId: json['companyId'],
         assignedPathId: json['assignedPathId'],
         driverId: json['driverId'],
         driverName: json['driverName'],
         itemsDetail: json['itemsDetail'],
-        location: json['location'],
+        location: Location.fromJson(json['location']),
         orderId: json['orderId'],
         orderNumber: json['orderNumber'],
         placeId: json['placeId'],
-        priority: priority);
+        priority: json['priority']);
   }
 }
 
-Order o = Order(
-  address: "address",
-  cphone: "cphone",
-  cname: "cname",
-  currentStatus: DeliveryStatus.Accepted,
-  deliveryDate: DateTime.now(),
-  specialInstructions: "specialInstructions",
-);
+// enum DeliveryStatus {
+//   NotAssigned,
+//   Assigned,
+//   PathAssigned,
+//   SentToDriver,
+//   OnTheWay,
+//   Accepted,
+//   Delivered,
+//   Picked,
+//   Returned,
+// }
 
-enum DeliveryStatus {
-  NotAssigned,
-  Assigned,
-  PathAssigned,
-  SentToDriver,
-  OnTheWay,
-  Accepted,
-  Delivered,
-  Picked,
-  Returned,
-}
-
-enum Priority { High, Medium, Low }
+// enum Priority { High, Medium, Low }
