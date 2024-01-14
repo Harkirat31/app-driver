@@ -1,4 +1,4 @@
-import 'package:drivers/views/orders.dart';
+import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/signin.dart';
 import 'package:flutter/material.dart';
 
@@ -18,6 +18,10 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
+        routes: {
+          '/landing': (context) => const Landing(),
+          '/signIn': (context) => const SignIn()
+        },
         home: const SignIn());
   }
 }
