@@ -1,5 +1,5 @@
+import 'package:drivers/helper/dateHelper.dart';
 import 'package:drivers/model/location.dart';
-import 'dart:convert';
 
 class Order {
   String? companyId;
@@ -39,10 +39,10 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    DateTime getDateFromString(String date) {
-      DateTime d = DateTime.parse(date);
-      return d;
-    }
+    // DateTime getDateFromString(String date) {
+    //   DateTime d = DateTime.parse(date);
+    //   return d;
+    // }
 
     return Order(
         address: json['address'],
