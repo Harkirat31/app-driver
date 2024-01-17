@@ -1,3 +1,6 @@
+import 'package:drivers/service/Exceptions.dart/spp_exceptions.dart';
+import 'package:drivers/service/api_service.dart';
+import 'package:drivers/views/landing.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
@@ -18,6 +21,13 @@ class _SignInState extends State<SignIn> {
     _email = TextEditingController();
     _password = TextEditingController();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,7 +62,22 @@ class _SignInState extends State<SignIn> {
               height: 8,
             ),
             TextButton(
-              onPressed: () => {},
+              onPressed: () {
+                ApiService()
+                    .signIn("harkiratsingh.tu@gmail.com", "Password123!")
+                    .then((value) {
+                  if (value) {
+                    Navigator.of(context)
+                        .pushNamedAndRemoveUntil('/landing', (_) => false);
+                  }
+                }).onError((error, stackTrace) {
+                  if (error is WrongCredentials) {
+                    print("Show Wrong Credential");
+                  } else {
+                    print("Show Wrong Credential");
+                  }
+                });
+              },
               style: TextButton.styleFrom(
                   foregroundColor: Colors.white, // Text color
                   backgroundColor: Colors.blue.shade600, // Background color
