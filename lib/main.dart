@@ -1,3 +1,4 @@
+import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/signin.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class MyApp extends StatelessWidget {
         ),
         routes: {
           '/landing': (context) => const Landing(),
-          '/signIn': (context) => const SignIn()
+          '/signIn': (context) => const SignIn(),
+          '/init': (context) => const Init(),
         },
         home: const SignIn());
   }

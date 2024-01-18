@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:drivers/config.dart';
-import 'package:drivers/service/Exceptions.dart/spp_exceptions.dart';
+import 'package:drivers/exception/Exceptions.dart/spp_exceptions.dart';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -47,30 +48,21 @@ class ApiService {
   }
 
   void getDriverCompanyList() {
-    // http
-    //     .post(Uri.parse('${BASE_URL}auth/signinDriver'),
-    //         headers: {
-    //           'Content-Type': 'application/json; charset=UTF-8',
-    //         },
-    //         body: jsonEncode({
-    //           "email": "harkiratsingh.tu@gmail.com",
-    //           "password": "Password123!"
-    //         }))
-    //     .then((value) {
-    //   print(jsonDecode(value.body));
-    //   return true;
-    // }).onError((error, stackTrace) {
-    //   print(error);
-    //   return false;
-    // });
-    http
-        .get(Uri.parse('${BASE_URL}driver/getDriver'), headers: {
-          "Authorization":
-              "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI3eVBXVUd1bGE4VGZWY3RLOWN5VW5Lc3VxMWwyIiwiaWF0IjoxNzA1MzQ3MTI3LCJleHAiOjE3MDc5MzkxMjd9.Dw7CBJwiyFeMvyuxRWYpzG54-QnWhJh3VlgKFe0gZBM"
-        })
-        .then(
-            (value) => {print(jsonDecode(value.body) as Map<String, dynamic>)})
-        .onError((error, stackTrace) => {print(error)});
+    SharedPreferences.getInstance().then((value) {
+      String? token = value.getString("token");
+      if (token != null) {
+        http
+            .get(
+              Uri.parse('${BASE_URL}driver/getDriver'),
+              headers: {
+                "Authorization": "Bearer $token",
+              },
+            )
+            .then((value) =>
+                {print(jsonDecode(value.body) as Map<String, dynamic>)})
+            .onError((error, stackTrace) => {print(error)});
+      } else {}
+    }).onError((error, stackTrace) {});
 
     // List<dynamic> pathsInJson = json['paths'];
     // List<Path> paths = [];

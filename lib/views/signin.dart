@@ -68,7 +68,7 @@ class _SignInState extends State<SignIn> {
                     .then((value) {
                   if (value) {
                     Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/landing', (_) => false);
+                        .pushNamedAndRemoveUntil('/init', (_) => false);
                   }
                 }).onError((error, stackTrace) {
                   if (error is WrongCredentials) {
