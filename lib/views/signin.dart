@@ -1,4 +1,4 @@
-import 'package:drivers/service/Exceptions.dart/spp_exceptions.dart';
+import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
 import 'package:drivers/service/api_service.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:flutter/material.dart';
