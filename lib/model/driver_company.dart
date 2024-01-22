@@ -30,7 +30,9 @@ class DriverCompany {
     return DriverCompany(
       email: json['email'],
       isAutomaticallyTracked: json['isAutomaticallyTracked'],
-      currentLocation: Location.fromJson(json['currentLocation']),
+      currentLocation: json['currentLocation'] != null
+          ? Location.fromJson(json['currentLocation'])
+          : null,
       name: json['name'],
       phone: json['phone'],
       vehicleStyle: json['vehicleStyle'],

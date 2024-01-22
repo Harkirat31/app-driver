@@ -1,4 +1,4 @@
-DateTime getDateFromString(String date) {
-  DateTime d = DateTime.parse(date);
+DateTime getDateFromString(Map<String, dynamic> date) {
+  DateTime d = DateTime.parse(date['_seconds']);
   return d;
 }

@@ -24,6 +24,6 @@ class MyApp extends StatelessWidget {
           '/signIn': (context) => const SignIn(),
           '/init': (context) => const Init(),
         },
-        home: const SignIn());
+        home: const Init());
   }
 }

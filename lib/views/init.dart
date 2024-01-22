@@ -15,6 +15,9 @@ class _InitState extends State<Init> {
     SharedPreferences.getInstance().then((value) {
       if (value.getString("token") != null) {
         // fetch data and populate Providers
+
+        ApiService().getDriverCompanyList();
+
         Navigator.of(context)
             .pushNamedAndRemoveUntil('/landing', (route) => false);
       } else {

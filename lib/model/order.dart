@@ -16,7 +16,7 @@ class Order {
   String? driverId;
   String? driverName;
   String currentStatus;
-  DateTime deliveryDate;
+  DateTime? deliveryDate;
   String? specialInstructions;
   String priority;
   Order({
@@ -33,23 +33,19 @@ class Order {
     required this.cphone,
     required this.cname,
     required this.currentStatus,
-    required this.deliveryDate,
+    this.deliveryDate,
     this.specialInstructions,
     this.priority = "Medium",
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    // DateTime getDateFromString(String date) {
-    //   DateTime d = DateTime.parse(date);
-    //   return d;
-    // }
-
+    print(getDateFromString(json['deliveryDate']));
     return Order(
         address: json['address'],
         cphone: json['cphone'],
         cname: json["cname"],
         currentStatus: json['currentStatus'],
-        deliveryDate: getDateFromString(json['deliveryDate']),
+        // deliveryDate: getDateFromString(json['deliveryDate']),
         specialInstructions: json['specialInstructions'],
         companyId: json['companyId'],
         assignedPathId: json['assignedPathId'],
