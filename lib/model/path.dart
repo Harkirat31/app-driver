@@ -18,10 +18,9 @@ class Path {
       this.driverId,
       this.driverName});
   factory Path.fromJson(Map<String, dynamic> json) {
-    print(json['dateOfPath']);
     return Path(
         pathId: json['pathId'],
-        // dateOfPath: getDateFromString(json['dateOfPath']),
+        dateOfPath: getDateFromString(json['dateOfPath']),
         //show: bool.parse(json['show']),
         companyId: json['companyId'],
         driverId: json['driverId'],

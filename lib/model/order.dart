@@ -29,6 +29,7 @@ class Order {
     this.placeId,
     this.driverId,
     this.driverName,
+    this.cemail,
     required this.address,
     required this.cphone,
     required this.cname,
@@ -39,13 +40,14 @@ class Order {
   });
 
   factory Order.fromJson(Map<String, dynamic> json) {
-    print(getDateFromString(json['deliveryDate']));
+    getDateFromString(json['deliveryDate']);
     return Order(
         address: json['address'],
         cphone: json['cphone'],
         cname: json["cname"],
+        cemail: json['cemail'],
         currentStatus: json['currentStatus'],
-        // deliveryDate: getDateFromString(json['deliveryDate']),
+        deliveryDate: getDateFromString(json['deliveryDate']),
         specialInstructions: json['specialInstructions'],
         companyId: json['companyId'],
         assignedPathId: json['assignedPathId'],

@@ -1,10 +1,16 @@
+import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/signin.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+      create: (BuildContext context) {
+        return DriverCompanyProvider();
+      },
+      child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

@@ -1,5 +1,7 @@
+import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/service/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Init extends StatefulWidget {
@@ -16,10 +18,14 @@ class _InitState extends State<Init> {
       if (value.getString("token") != null) {
         // fetch data and populate Providers
 
-        ApiService().getDriverCompanyList();
-
-        Navigator.of(context)
-            .pushNamedAndRemoveUntil('/landing', (route) => false);
+        ApiService().getDriverCompanyList().then((value) {
+          context.read<DriverCompanyProvider>().addDriverCompantList(value);
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/landing', (route) => false);
+        }).onError((error, stackTrace) {
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/signIn', (route) => false);
+        });
       } else {
         Navigator.of(context)
             .pushNamedAndRemoveUntil('/signIn', (route) => false);

@@ -1,4 +1,6 @@
 DateTime getDateFromString(Map<String, dynamic> date) {
-  DateTime d = DateTime.parse(date['_seconds']);
-  return d;
+  int seconds = date['_seconds'] as int;
+  DateTime utcDate =
+      DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
+  return utcDate;
 }

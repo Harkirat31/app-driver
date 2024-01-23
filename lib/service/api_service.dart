@@ -49,51 +49,68 @@ class ApiService {
     });
   }
 
-  void getDriverCompanyList() {
-    SharedPreferences.getInstance().then((value) {
-      String? token = value.getString("token");
-      if (token != null) {
-        http.get(
-          Uri.parse('${BASE_URL}driver/getDriver'),
-          headers: {
-            "Authorization": "Bearer $token",
-          },
-        ).then((value) {
-          Map<String, dynamic> dataMap =
-              jsonDecode(value.body) as Map<String, dynamic>;
-          List<DriverCompany> allDriverCompany = [];
-          List<Order> allOrders = [];
-          List<Path> allPaths = [];
-          var arrayDriverCompany = dataMap['driverCompanyList'] as List;
-          var paths = dataMap['paths'] as List;
-          var orders = dataMap['orders'] as List;
+  Future<List<DriverCompany>> getDriverCompanyList() {
+    return Future(() {
+      return SharedPreferences.getInstance().then((value) {
+        String? token = value.getString("token");
+        if (token != null) {
+          return http.get(
+            Uri.parse('${BASE_URL}driver/getDriver'),
+            headers: {
+              "Authorization": "Bearer $token",
+            },
+          ).then((value) {
+            Map<String, dynamic> dataMap =
+                jsonDecode(value.body) as Map<String, dynamic>;
+            List<DriverCompany> allDriverCompany = [];
+            Map<String, Order> allOrders = {};
+            Map<String, List<Path>> allPaths = {};
+            var arrayDriverCompany = dataMap['driverCompanyList'] as List;
+            var paths = dataMap['paths'] as List;
+            var orders = dataMap['orders'] as List;
 
-          for (Map<String, dynamic> orderJson in orders) {
-            Order order = Order.fromJson(orderJson);
-            allOrders.add(order);
-          }
+            for (Map<String, dynamic> orderJson in orders) {
+              Order order = Order.fromJson(orderJson);
+              allOrders[order.orderId!] = order;
+            }
 
-          // for (Map<String, dynamic> pathJson in paths) {
-          //   Path path = Path.fromJson(pathJson);
-          //   allPaths.add(path);
-          // }
-          for (Map<String, dynamic> element in arrayDriverCompany) {
-            DriverCompany driverCompany = DriverCompany.fromJson(element);
-            allDriverCompany.add(driverCompany);
-          }
+            for (Map<String, dynamic> pathJson in paths) {
+              Path path = Path.fromJson(pathJson);
+              List<Order> orders = [];
+              List<dynamic> ordersInPath = pathJson['path'] as List<dynamic>;
+              for (String orderId in ordersInPath) {
+                orders.add(allOrders[orderId]!);
+              }
+              path.path = orders;
+              if (allPaths.containsKey(path.companyId!)) {
+                allPaths[path.companyId!]!.add(path);
+              } else {
+                allPaths[path.companyId!] = [path];
+              }
+            }
 
-          print(allPaths.length);
-        }).onError((error, stackTrace) {
-          print(error);
-        });
-      } else {}
-    }).onError((error, stackTrace) {});
-
-    // List<dynamic> pathsInJson = json['paths'];
-    // List<Path> paths = [];
-    // for (var element in pathsInJson) {
-    //   Path path = Path.fromJson(element);
-    //   paths.add(path);
-    // }
+            for (Map<String, dynamic> element in arrayDriverCompany) {
+              DriverCompany driverCompany = DriverCompany.fromJson(element);
+              driverCompany.paths = allPaths[driverCompany.companyId!];
+              allDriverCompany.add(driverCompany);
+            }
+            return allDriverCompany;
+          }).onError((error, stackTrace) {
+            if (error != null) {
+              throw error;
+            } else {
+              throw GenericException();
+            }
+          });
+        } else {
+          throw UserNotLogin();
+        }
+      }).onError((error, stackTrace) {
+        if (error != null) {
+          throw error;
+        }
+        throw GenericException();
+      });
+    });
   }
 }
