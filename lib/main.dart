@@ -24,6 +24,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
+          appBarTheme: const AppBarTheme(
+            color: Colors.blue,
+          ),
         ),
         routes: {
           '/landing': (context) => const Landing(),
