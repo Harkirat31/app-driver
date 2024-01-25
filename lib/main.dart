@@ -1,6 +1,7 @@
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
+import 'package:drivers/views/order_info.dart';
 import 'package:drivers/views/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
           '/landing': (context) => const Landing(),
           '/signIn': (context) => const SignIn(),
           '/init': (context) => const Init(),
+          '/orderInfo': (context) => const OrderInfo()
         },
         home: const Init());
   }

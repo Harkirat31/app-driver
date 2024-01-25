@@ -3,7 +3,6 @@ import 'package:drivers/model/driver_company.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:drivers/model/path.dart' as PathModel;
 
 class Landing extends StatefulWidget {
   const Landing({super.key});
@@ -48,19 +47,20 @@ class _LandingState extends State<Landing> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Welcome")),
-      body: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(8.0),
-        child: Column(children: [
-          driverCompanies.isNotEmpty
-              ? getCompaniesDropdown()
-              : const Text("Nothing Assigned"),
-          selectedCompanyIndex != null
-              ? PathsList(
-                  paths: driverCompanies[selectedCompanyIndex!].paths,
-                )
-              : const Text("Select Company")
-        ]),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(children: [
+            driverCompanies.isNotEmpty
+                ? getCompaniesDropdown()
+                : const Text("Nothing Assigned"),
+            selectedCompanyIndex != null
+                ? PathsList(
+                    driverCompany: driverCompanies[selectedCompanyIndex!],
+                  )
+                : const Text("Select Company")
+          ]),
+        ),
       ),
     );
   }
