@@ -1,9 +1,10 @@
+import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/model/order.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
+import 'package:drivers/service/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class OrderInfo extends StatefulWidget {
   const OrderInfo({super.key});
@@ -98,6 +99,15 @@ class _OrderInfoState extends State<OrderInfo> {
                   child: ElevatedButton(
                       onPressed: () {
                         setState(() {
+                          LoadingScreen()
+                              .show(context: context, text: "Please Wait ..");
+                          ApiService()
+                              .markDelivered(order!.orderId!)
+                              .then((value) {
+                            LoadingScreen().hide();
+                          }).onError((error, stackTrace) {
+                            LoadingScreen().hide();
+                          });
                           order!.currentStatus = "Delivered";
                           context.read<DriverCompanyProvider>().updateData();
                         });

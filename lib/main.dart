@@ -26,8 +26,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           appBarTheme: const AppBarTheme(
-            color: Colors.blue,
-          ),
+              color: Colors.blue,
+              titleTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold)),
         ),
         routes: {
           '/landing': (context) => const Landing(),

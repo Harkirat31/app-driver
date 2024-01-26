@@ -113,4 +113,44 @@ class ApiService {
       });
     });
   }
+
+  Future<bool> markDelivered(String orderId) {
+    return Future(() {
+      return SharedPreferences.getInstance().then((value) {
+        String? token = value.getString("token");
+        if (token != null) {
+          return http
+              .post(Uri.parse('${BASE_URL}driver/updateOrderStatus'),
+                  headers: {
+                    "Authorization": "Bearer $token",
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(
+                      {"orderId": orderId, "currentStatus": "Delivered"}))
+              .then((value) {
+            Map<String, dynamic> result =
+                jsonDecode(value.body) as Map<String, dynamic>;
+            if (result['isUpdated'] == true) {
+              return true;
+            } else {
+              throw GenericException();
+            }
+          }).onError((error, stackTrace) {
+            if (error != null) {
+              throw error;
+            } else {
+              throw GenericException();
+            }
+          });
+        } else {
+          throw UserNotLogin();
+        }
+      }).onError((error, stackTrace) {
+        if (error != null) {
+          throw error;
+        }
+        throw GenericException();
+      });
+    });
+  }
 }

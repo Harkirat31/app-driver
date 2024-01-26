@@ -3,6 +3,7 @@ import 'package:drivers/model/driver_company.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Landing extends StatefulWidget {
   const Landing({super.key});
@@ -46,7 +47,9 @@ class _LandingState extends State<Landing> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Welcome")),
+      appBar: AppBar(
+        title: const Text("Welcome"),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -60,6 +63,40 @@ class _LandingState extends State<Landing> {
                   )
                 : const Text("Select Company")
           ]),
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            const DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
+              ),
+              child: Text('Menu'),
+            ),
+            ListTile(
+              title: const Text('Home'),
+              onTap: () {
+                // Then close the drawer
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              title: const Text('Logout'),
+              onTap: () {
+                SharedPreferences.getInstance().then((value) {
+                  value.remove("token");
+                  context.read<DriverCompanyProvider>().logout();
+                  Navigator.of(context)
+                      .pushNamedAndRemoveUntil("/signIn", (route) => false);
+                }).onError((error, stackTrace) {
+                  //show error
+                  Navigator.pop(context);
+                });
+              },
+            ),
+          ],
         ),
       ),
     );

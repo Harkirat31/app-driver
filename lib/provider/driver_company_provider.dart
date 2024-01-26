@@ -15,4 +15,8 @@ class DriverCompanyProvider extends ChangeNotifier {
   void updateData() {
     notifyListeners();
   }
+
+  void logout() {
+    _driverCompanyList.clear();
+  }
 }
