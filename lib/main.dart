@@ -1,6 +1,9 @@
+import 'dart:collection';
+
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
+import 'package:drivers/views/map_view.dart';
 import 'package:drivers/views/order_info.dart';
 import 'package:drivers/views/signin.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +25,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         title: 'Flutter Demo',
+        debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
@@ -36,7 +40,8 @@ class MyApp extends StatelessWidget {
           '/landing': (context) => const Landing(),
           '/signIn': (context) => const SignIn(),
           '/init': (context) => const Init(),
-          '/orderInfo': (context) => const OrderInfo()
+          '/orderInfo': (context) => const OrderInfo(),
+          '/mapView': (context) => PathMapView()
         },
         home: const Init());
   }

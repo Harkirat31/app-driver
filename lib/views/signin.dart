@@ -1,6 +1,5 @@
 import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
 import 'package:drivers/service/api_service.dart';
-import 'package:drivers/views/landing.dart';
 import 'package:flutter/material.dart';
 
 class SignIn extends StatefulWidget {
@@ -63,18 +62,44 @@ class _SignInState extends State<SignIn> {
             ),
             TextButton(
               onPressed: () {
-                ApiService()
-                    .signIn("harkiratsingh.tu@gmail.com", "Password123!")
-                    .then((value) {
+                if (_email.text == null || _email.text == "") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Enter Email'),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                  return;
+                }
+                if (_password.text == null || _password.text == "") {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Enter Password'),
+                      duration: Duration(seconds: 3),
+                    ),
+                  );
+                  return;
+                }
+                ApiService().signIn(_email.text, _password.text).then((value) {
                   if (value) {
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil('/init', (_) => false);
                   }
-                }).onError((error, stackTrace) {
+                }).catchError((error) {
                   if (error is WrongCredentials) {
-                    print("Show Wrong Credential");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Wrong Credentials'),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
                   } else {
-                    print("Show Wrong Credential");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Email is incorrect / Server Problem'),
+                        duration: Duration(seconds: 3),
+                      ),
+                    );
                   }
                 });
               },

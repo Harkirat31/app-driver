@@ -39,7 +39,7 @@ class ApiService {
             throw GenericException();
           }
         }
-      }).onError((error, stackTrace) {
+      }).catchError((error, stackTrace) {
         if (error != null) {
           throw error;
         } else {
@@ -95,7 +95,7 @@ class ApiService {
               allDriverCompany.add(driverCompany);
             }
             return allDriverCompany;
-          }).onError((error, stackTrace) {
+          }).catchError((error) {
             if (error != null) {
               throw error;
             } else {
