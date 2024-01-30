@@ -41,7 +41,11 @@ class PathsList extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed('/mapView');
+                          Navigator.of(context).pushNamed("/mapView",
+                              arguments: {
+                                "company": driverCompany,
+                                "path": paths[index]
+                              });
                         },
                         child: const Text(
                           "Show in Map",

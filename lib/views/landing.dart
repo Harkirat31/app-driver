@@ -19,8 +19,7 @@ class _LandingState extends State<Landing> {
   @override
   void didChangeDependencies() {
     driverCompanies = context.watch<DriverCompanyProvider>().driverCompanies;
-    // selectedCompanyId =
-    //     driverCompanies.isNotEmpty ? driverCompanies[0].companyId : null;
+    selectedCompanyIndex = driverCompanies.isNotEmpty ? 0 : null;
     super.didChangeDependencies();
   }
 

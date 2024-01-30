@@ -1,4 +1,5 @@
 import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
+import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/service/api_service.dart';
 import 'package:flutter/material.dart';
 
@@ -80,12 +81,15 @@ class _SignInState extends State<SignIn> {
                   );
                   return;
                 }
+                LoadingScreen().show(context: context, text: "Signing In...");
                 ApiService().signIn(_email.text, _password.text).then((value) {
                   if (value) {
+                    LoadingScreen().hide();
                     Navigator.of(context)
                         .pushNamedAndRemoveUntil('/init', (_) => false);
                   }
                 }).catchError((error) {
+                  LoadingScreen().hide();
                   if (error is WrongCredentials) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

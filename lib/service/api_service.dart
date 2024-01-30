@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:drivers/config.dart';
 import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
 import 'package:drivers/model/driver_company.dart';
@@ -13,6 +14,7 @@ class ApiService {
   factory ApiService() => _shared;
 
   Future<bool> signIn(String email, String password) {
+    final client = HttpClient();
     return Future(() {
       return http
           .post(Uri.parse('${BASE_URL}auth/signinDriver'),
@@ -20,7 +22,9 @@ class ApiService {
                 'Content-Type': 'application/json; charset=UTF-8',
               },
               body: jsonEncode({"email": email, "password": password}))
-          .then((value) async {
+          .timeout(const Duration(seconds: REQUEST_WAIT_TIME), onTimeout: () {
+        throw Exception();
+      }).then((value) async {
         Map<String, dynamic> result =
             jsonDecode(value.body) as Map<String, dynamic>;
         if (result['token'] != null) {
@@ -59,7 +63,9 @@ class ApiService {
             headers: {
               "Authorization": "Bearer $token",
             },
-          ).then((value) {
+          ).timeout(const Duration(seconds: REQUEST_WAIT_TIME), onTimeout: () {
+            throw Exception();
+          }).then((value) {
             Map<String, dynamic> dataMap =
                 jsonDecode(value.body) as Map<String, dynamic>;
             List<DriverCompany> allDriverCompany = [];
@@ -127,7 +133,10 @@ class ApiService {
                   },
                   body: jsonEncode(
                       {"orderId": orderId, "currentStatus": "Delivered"}))
-              .then((value) {
+              .timeout(const Duration(seconds: REQUEST_WAIT_TIME),
+                  onTimeout: () {
+            throw Exception();
+          }).then((value) {
             Map<String, dynamic> result =
                 jsonDecode(value.body) as Map<String, dynamic>;
             if (result['isUpdated'] == true) {
