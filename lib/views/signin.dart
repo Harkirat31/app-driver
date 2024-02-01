@@ -43,9 +43,9 @@ class _SignInState extends State<SignIn> {
             TextField(
               controller: _email,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Email',
-              ),
+                  border: OutlineInputBorder(),
+                  hintText: 'Email',
+                  label: Text("Email")),
             ),
             const SizedBox(
               height: 8,
@@ -53,9 +53,9 @@ class _SignInState extends State<SignIn> {
             TextField(
               controller: _password,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Password',
-              ),
+                  border: OutlineInputBorder(),
+                  hintText: 'Password',
+                  label: Text("Password")),
               obscureText: true,
             ),
             const SizedBox(
