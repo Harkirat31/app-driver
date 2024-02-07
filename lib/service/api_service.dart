@@ -13,8 +13,18 @@ class ApiService {
   static final ApiService _shared = ApiService._sharedInstance();
   factory ApiService() => _shared;
 
+  Future<void> saveFCMToken(String fcmToken, String jwtToken) {
+    return Future(() => http
+        .post(Uri.parse('${BASE_URL}driver/saveFCMToken'),
+            headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
+              "Authorization": "Bearer $jwtToken",
+            },
+            body: jsonEncode({"FCMToken": fcmToken}))
+        .then((value) => value)).catchError((err) {});
+  }
+
   Future<bool> signIn(String email, String password) {
-    final client = HttpClient();
     return Future(() {
       return http
           .post(Uri.parse('${BASE_URL}auth/signinDriver'),

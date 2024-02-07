@@ -1,15 +1,17 @@
-import 'dart:collection';
-
+import 'package:drivers/firebase_options.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/map_view.dart';
 import 'package:drivers/views/order_info.dart';
 import 'package:drivers/views/signin.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(ChangeNotifierProvider(
       create: (BuildContext context) {
         return DriverCompanyProvider();

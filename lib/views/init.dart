@@ -1,5 +1,6 @@
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/service/api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,6 +17,8 @@ class _InitState extends State<Init> {
   void initState() {
     SharedPreferences.getInstance().then((value) {
       if (value.getString("token") != null) {
+        //dave FCM Token in db backend
+        handleFCM(value.getString("token")!);
         // fetch data and populate Providers
 
         ApiService().getDriverCompanyList().then((value) {
@@ -40,4 +43,22 @@ class _InitState extends State<Init> {
       body: Center(child: CircularProgressIndicator()),
     );
   }
+}
+
+Future<void> saveTokenToDatabase(String jwtToken) async {
+  // Assume user is logged in for this example
+  try {
+    String? token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      await ApiService().saveFCMToken(token, jwtToken);
+    }
+  } catch (e) {}
+}
+
+void handleFCM(String jwtToken) async {
+  await saveTokenToDatabase(jwtToken);
+  FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+  // FirebaseMessaging.onMessage.listen((event) {
+  //   print(event.data);
+  // });
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "566400378283",
+    "project_id": "bounce123-61629",
+    "storage_bucket": "bounce123-61629.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:566400378283:android:5858c127580ef8416f1eee",
+        "android_client_info": {
+          "package_name": "com.easeyourtasks.delivery.drivers"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHQPXftUDm-v-IMIYrXhzipdjD6FamkY4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
