@@ -38,6 +38,11 @@ class _InitState extends State<Init> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
@@ -68,12 +73,4 @@ void handleFCM(String jwtToken) async {
     sound: true,
   );
   FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
-  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  // FirebaseMessaging.onMessage.listen((event) {
-  //   print(event.data);
-  // });
 }
-
-// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-//   print("Handling a background message: ${message.messageId}");
-// }

@@ -1,5 +1,6 @@
 import 'package:drivers/firebase_options.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
+import 'package:drivers/service/api_service.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/map_view.dart';
@@ -19,9 +20,14 @@ Future<void> main() async {
       child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

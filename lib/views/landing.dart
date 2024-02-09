@@ -1,6 +1,9 @@
 import 'package:drivers/components/paths_list.dart';
+import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/model/driver_company.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
+import 'package:drivers/service/api_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,9 +15,42 @@ class Landing extends StatefulWidget {
   State<Landing> createState() => _LandingState();
 }
 
-class _LandingState extends State<Landing> {
+class _LandingState extends State<Landing> with WidgetsBindingObserver {
   late List<DriverCompany> driverCompanies;
   int? selectedCompanyIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    FirebaseMessaging.onMessage.listen((event) {
+      print("Hello");
+      refresh();
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  void refresh() {
+    LoadingScreen().show(context: context, text: "Refreshing..");
+    ApiService().getDriverCompanyList().then((value) {
+      context.read<DriverCompanyProvider>().refresh(value);
+      LoadingScreen().hide();
+    }).onError((error, stackTrace) {
+      LoadingScreen().hide();
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      refresh();
+    }
+  }
 
   @override
   void didChangeDependencies() {
