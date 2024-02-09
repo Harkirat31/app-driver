@@ -57,8 +57,23 @@ Future<void> saveTokenToDatabase(String jwtToken) async {
 
 void handleFCM(String jwtToken) async {
   await saveTokenToDatabase(jwtToken);
+  NotificationSettings settings =
+      await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
+  );
   FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   // FirebaseMessaging.onMessage.listen((event) {
   //   print(event.data);
   // });
 }
+
+// Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+//   print("Handling a background message: ${message.messageId}");
+// }

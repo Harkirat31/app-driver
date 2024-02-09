@@ -33,7 +33,7 @@ class _LandingState extends State<Landing> {
             driverCompanies.asMap().entries.map<DropdownMenuItem<int>>((item) {
           return DropdownMenuItem(
             value: item.key,
-            child: Text(item.value.companyName!),
+            child: Text(item.value.companyName ?? "N/A"),
           );
         }).toList(),
         onChanged: (value) {
