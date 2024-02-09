@@ -24,7 +24,6 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     FirebaseMessaging.onMessage.listen((event) {
-      print("Hello");
       refresh();
     });
   }
@@ -92,6 +91,21 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
             driverCompanies.isNotEmpty
                 ? getCompaniesDropdown()
                 : const Text("Nothing Assigned"),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                GestureDetector(
+                  onTap: () => refresh(),
+                  child: const Text(
+                    "Refresh",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blue,
+                        decoration: TextDecoration.underline),
+                  ),
+                ),
+              ],
+            ),
             selectedCompanyIndex != null
                 ? PathsList(
                     driverCompany: driverCompanies[selectedCompanyIndex!],
