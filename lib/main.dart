@@ -1,6 +1,5 @@
 import 'package:drivers/firebase_options.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
-import 'package:drivers/service/api_service.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/map_view.dart';
