@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/model/order.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
@@ -141,12 +143,27 @@ class _OrderInfoState extends State<OrderInfo> {
   }
 
   Future<void> launchGoogleMaps(double lat, double lng) async {
-    double destinationLatitude = lat;
-    double destinationLongitude = lng;
-    final uri = Uri(
-        scheme: "google.navigation",
-        // host: '"0,0"',  {here we can put host}
-        queryParameters: {'q': '$destinationLatitude, $destinationLongitude'});
+    double latitude = lat;
+    double longitude = lng;
+    Uri uri;
+    if (Platform.isAndroid) {
+      // Use geo: scheme for Android
+      uri = Uri(
+        scheme: 'geo',
+        host: '0,0',
+        queryParameters: {'q': '$latitude,$longitude'},
+      );
+    } else if (Platform.isIOS) {
+      // First, try to open Google Maps if it's installed
+      uri = Uri.parse('comgooglemaps://?q=$latitude,$longitude');
+
+      // If Google Maps is not installed, fall back to Apple Maps
+      if (!await canLaunchUrl(uri)) {
+        uri = Uri.parse('maps://?q=$latitude,$longitude');
+      }
+    } else {
+      throw 'Unsupported platform';
+    }
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
