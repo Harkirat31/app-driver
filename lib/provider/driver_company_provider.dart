@@ -17,6 +17,8 @@ class DriverCompanyProvider extends ChangeNotifier {
   }
 
   void refresh(List<DriverCompany> driverCompanies) {
+    // DateTime date = DateTime.now();
+    // print(date);
     _driverCompanyList.clear();
     _driverCompanyList.addAll(driverCompanies);
     notifyListeners();
