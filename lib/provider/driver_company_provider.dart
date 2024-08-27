@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 class DriverCompanyProvider extends ChangeNotifier {
   final List<DriverCompany> _driverCompanyList = [];
+  DateTime _selectedDate =  DateTime.now();
   void addDriverCompantList(List<DriverCompany> driverCompanies) {
     _driverCompanyList.addAll(driverCompanies);
     notifyListeners();
@@ -12,13 +13,19 @@ class DriverCompanyProvider extends ChangeNotifier {
   //     UnmodifiableListView(_driverCompanyList);
   List<DriverCompany> get driverCompanies => _driverCompanyList;
 
+  DateTime get selectedDate => _selectedDate;
+
   void updateData() {
     notifyListeners();
   }
 
+  void updateDate(DateTime date){
+    _selectedDate = date; 
+     notifyListeners();
+  }
+
+
   void refresh(List<DriverCompany> driverCompanies) {
-    // DateTime date = DateTime.now();
-    // print(date);
     _driverCompanyList.clear();
     _driverCompanyList.addAll(driverCompanies);
     notifyListeners();

@@ -21,7 +21,7 @@ class _InitState extends State<Init> {
         handleFCM(value.getString("token")!);
         // fetch data and populate Providers
 
-        ApiService().getDriverCompanyList().then((value) {
+        ApiService().getDriverCompanyListWithDate(DateTime.now()).then((value) {
           context.read<DriverCompanyProvider>().addDriverCompantList(value);
           Navigator.of(context)
               .pushNamedAndRemoveUntil('/landing', (route) => false);

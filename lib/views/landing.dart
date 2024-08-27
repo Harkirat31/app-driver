@@ -18,6 +18,8 @@ class Landing extends StatefulWidget {
 class _LandingState extends State<Landing> with WidgetsBindingObserver {
   late List<DriverCompany> driverCompanies;
   int? selectedCompanyIndex;
+  late DateTime selectedDate;
+  
 
   @override
   void initState() {
@@ -36,7 +38,17 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
 
   void refresh() {
     LoadingScreen().show(context: context, text: "Refreshing..");
-    ApiService().getDriverCompanyList().then((value) {
+    ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
+      context.read<DriverCompanyProvider>().refresh(value);
+      LoadingScreen().hide();
+    }).onError((error, stackTrace) {
+      LoadingScreen().hide();
+    });
+  }
+
+  void changeDate (){
+    LoadingScreen().show(context: context, text: "Refreshing..");
+    ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
       context.read<DriverCompanyProvider>().refresh(value);
       LoadingScreen().hide();
     }).onError((error, stackTrace) {
@@ -54,12 +66,29 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
   @override
   void didChangeDependencies() {
     driverCompanies = context.watch<DriverCompanyProvider>().driverCompanies;
+    selectedDate = context.watch<DriverCompanyProvider>().selectedDate;
     selectedCompanyIndex = driverCompanies.isNotEmpty ? 0 : null;
     super.didChangeDependencies();
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDate) {
+       
+      setState(() {
+        selectedDate = picked;
+        context.read<DriverCompanyProvider>().updateDate(picked);
+        changeDate();
+      });
+    }
+  } 
   @override
   Widget build(BuildContext context) {
+
     DropdownButton getCompaniesDropdown() {
       return DropdownButton(
         isExpanded: true,
@@ -88,6 +117,12 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
+             Text("${selectedDate.toLocal()}".split(' ')[0]),
+            const SizedBox(height: 20.0,),
+             ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: const Text('Select date'),
+            ),
             driverCompanies.isNotEmpty
                 ? getCompaniesDropdown()
                 : const Text("Nothing Assigned"),

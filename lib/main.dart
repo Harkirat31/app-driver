@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         routes: {
           '/landing': (context) => const Landing(),
           '/signIn': (context) => const SignIn(),
-          '/init': (context) => const Init(),
+          '/init': (context) =>  const Init(),
           '/orderInfo': (context) => const OrderInfo(),
           '/mapView': (context) => PathMapView()
         },

@@ -62,16 +62,19 @@ class ApiService {
     });
   }
 
-  Future<List<DriverCompany>> getDriverCompanyList() {
+  Future<List<DriverCompany>> getDriverCompanyListWithDate(DateTime date) {
     return Future(() {
       return SharedPreferences.getInstance().then((value) {
         String? token = value.getString("token");
         if (token != null) {
-          return http.get(
+          return http.post(
             Uri.parse('${BASE_URL}driver/getDriver'),
             headers: {
+              'Content-Type': 'application/json; charset=UTF-8',
               "Authorization": "Bearer $token",
             },
+            body: jsonEncode({"date":DateTime.utc(date.year,date.month,date.day).toString() })
+          
           ).timeout(const Duration(seconds: REQUEST_WAIT_TIME), onTimeout: () {
             throw Exception();
           }).then((value) {
@@ -111,6 +114,7 @@ class ApiService {
             }
             return allDriverCompany;
           }).catchError((error) {
+            print(error);
             if (error != null) {
               throw error;
             } else {
@@ -128,6 +132,77 @@ class ApiService {
       });
     });
   }
+
+  // Future<List<DriverCompany>> getDriverCompanyList() {
+  //   return Future(() {
+  //     return SharedPreferences.getInstance().then((value) {
+  //       String? token = value.getString("token");
+  //       if (token != null) {
+  //         return http.post(
+  //           Uri.parse('${BASE_URL}driver/getDriver'),
+  //           headers: {
+  //             'Content-Type': 'application/json; charset=UTF-8',
+  //             "Authorization": "Bearer $token",
+  //           },
+  //           body: jsonEncode({"date":"2024-02-20 00:00:00.000Z"})
+          
+  //         ).timeout(const Duration(seconds: REQUEST_WAIT_TIME), onTimeout: () {
+  //           throw Exception();
+  //         }).then((value) {
+  //           Map<String, dynamic> dataMap =
+  //               jsonDecode(value.body) as Map<String, dynamic>;
+  //           List<DriverCompany> allDriverCompany = [];
+  //           Map<String, Order> allOrders = {};
+  //           Map<String, List<Path>> allPaths = {};
+  //           var arrayDriverCompany = dataMap['driverCompanyList'] as List;
+  //           var paths = dataMap['paths'] as List;
+  //           var orders = dataMap['orders'] as List;
+
+  //           for (Map<String, dynamic> orderJson in orders) {
+  //             Order order = Order.fromJson(orderJson);
+  //             allOrders[order.orderId!] = order;
+  //           }
+
+  //           for (Map<String, dynamic> pathJson in paths) {
+  //             Path path = Path.fromJson(pathJson);
+  //             List<Order> orders = [];
+  //             List<dynamic> ordersInPath = pathJson['path'] as List<dynamic>;
+  //             for (String orderId in ordersInPath) {
+  //               orders.add(allOrders[orderId]!);
+  //             }
+  //             path.path = orders;
+  //             if (allPaths.containsKey(path.companyId!)) {
+  //               allPaths[path.companyId!]!.add(path);
+  //             } else {
+  //               allPaths[path.companyId!] = [path];
+  //             }
+  //           }
+
+  //           for (Map<String, dynamic> element in arrayDriverCompany) {
+  //             DriverCompany driverCompany = DriverCompany.fromJson(element);
+  //             driverCompany.paths = allPaths[driverCompany.companyId!];
+  //             allDriverCompany.add(driverCompany);
+  //           }
+  //           return allDriverCompany;
+  //         }).catchError((error) {
+  //           print(error);
+  //           if (error != null) {
+  //             throw error;
+  //           } else {
+  //             throw GenericException();
+  //           }
+  //         });
+  //       } else {
+  //         throw UserNotLogin();
+  //       }
+  //     }).onError((error, stackTrace) {
+  //       if (error != null) {
+  //         throw error;
+  //       }
+  //       throw GenericException();
+  //     });
+  //   });
+  // }
 
   Future<bool> markDelivered(String orderId) {
     return Future(() {
