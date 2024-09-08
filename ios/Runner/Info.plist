@@ -50,5 +50,15 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+    	<string>tel</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+  		<string>comgooglemaps</string>
+	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+    <string>This App does not need access to the location. You should not grant this access.</string>
 </dict>
 </plist>

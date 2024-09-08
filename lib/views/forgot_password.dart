@@ -1,40 +1,39 @@
-import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
+
 import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/service/api_service.dart';
 import 'package:flutter/material.dart';
 
-class SignIn extends StatefulWidget {
-  const SignIn({super.key});
+
+class ForgotPassword extends StatefulWidget {
+  const ForgotPassword({super.key});
 
   @override
-  State<SignIn> createState() => _SignInState();
+  State<ForgotPassword> createState() => _ForgotPasswordState();
 }
 
-class _SignInState extends State<SignIn> {
-  String? email;
+class _ForgotPasswordState extends State<ForgotPassword> {
+
   String? password;
   late TextEditingController _email;
-  late TextEditingController _password;
 
   @override
   void initState() {
     _email = TextEditingController();
-    _password = TextEditingController();
     super.initState();
   }
 
   @override
   void dispose() {
     _email.dispose();
-    _password.dispose();
     super.dispose();
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Sign in"),
+        title: const Text("Reset Password"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -50,15 +49,6 @@ class _SignInState extends State<SignIn> {
             const SizedBox(
               height: 8,
             ),
-           
-            TextField(
-              controller: _password,
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Password',
-                  label: Text("Password")),
-              obscureText: true,
-            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
@@ -67,11 +57,11 @@ class _SignInState extends State<SignIn> {
               width: double.infinity,
             ),
              GestureDetector(
-              onTap: () {
+               onTap: () {
                  Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/forgot', (_) => false);
+                        .pushNamedAndRemoveUntil('/signIn', (_) => false);
               },
-              child: const Text("Forgot Password ?",style: TextStyle(
+              child: const Text("Sign In",style: TextStyle(
                 decoration: TextDecoration.underline,
                 color: Colors.blue
               ),),
@@ -90,39 +80,26 @@ class _SignInState extends State<SignIn> {
                   );
                   return;
                 }
-                if (_password.text == null || _password.text == "") {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Enter Password'),
-                      duration: Duration(seconds: 3),
-                    ),
-                  );
-                  return;
-                }
-                LoadingScreen().show(context: context, text: "Signing In...");
-                ApiService().signIn(_email.text, _password.text).then((value) {
+                LoadingScreen().show(context: context, text: "Please wait...");
+                ApiService().resetPassword(_email.text,).then((value) {
                   if (value) {
                     LoadingScreen().hide();
-                    Navigator.of(context)
-                        .pushNamedAndRemoveUntil('/init', (_) => false);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Reset Email Sent !!'),
+                        duration: Duration(seconds: 6),
+                      ),
+                    );
                   }
                 }).catchError((error) {
                   LoadingScreen().hide();
-                  if (error is WrongCredentials) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Wrong Credentials'),
-                        duration: Duration(seconds: 3),
-                      ),
-                    );
-                  } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Email is incorrect / Server Problem'),
-                        duration: Duration(seconds: 3),
+                        duration: Duration(seconds: 4),
                       ),
                     );
-                  }
+                
                 });
               },
               style: TextButton.styleFrom(
@@ -133,7 +110,7 @@ class _SignInState extends State<SignIn> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0), // Border radius
                   )),
-              child: const Text("Sign In"),
+              child: const Text("Send Reset Link"),
             )
           ],
         ),
@@ -141,3 +118,4 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
+

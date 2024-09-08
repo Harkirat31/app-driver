@@ -19,7 +19,6 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
   late List<DriverCompany> driverCompanies;
   int? selectedCompanyIndex;
   late DateTime selectedDate;
-  
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
     });
   }
 
-  void changeDate (){
+  void changeDate() {
     LoadingScreen().show(context: context, text: "Refreshing..");
     ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
       context.read<DriverCompanyProvider>().refresh(value);
@@ -78,17 +77,16 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate) {
-       
       setState(() {
         selectedDate = picked;
         context.read<DriverCompanyProvider>().updateDate(picked);
         changeDate();
       });
     }
-  } 
+  }
+
   @override
   Widget build(BuildContext context) {
-
     DropdownButton getCompaniesDropdown() {
       return DropdownButton(
         isExpanded: true,
@@ -117,11 +115,35 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(children: [
-             Text("${selectedDate.toLocal()}".split(' ')[0]),
-            const SizedBox(height: 20.0,),
-             ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: const Text('Select date'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Date : ",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text("${selectedDate.toLocal()}".split(' ')[0]),
+                const SizedBox(
+                  width: 10.0,
+                ),
+                ElevatedButton(
+                  onPressed: () => _selectDate(context),
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.circular(12), // Rounded corners
+                    ),
+                    textStyle: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold, // Font weight
+                    ),
+                  ),
+                   child: const Text('Change date'),
+                ),
+              ],
+            ),
+            const SizedBox(
+              height: 10.0,
             ),
             driverCompanies.isNotEmpty
                 ? getCompaniesDropdown()

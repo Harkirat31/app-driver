@@ -11,7 +11,7 @@ class PathsList extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Path>? paths = driverCompany?.paths;
     if (paths == null) {
-      return const Text("No Order is Assigned");
+      return const Text("No Order is Assigned on this date");
     } else {
       return SizedBox(
         height: MediaQuery.of(context).size.height * 0.80,

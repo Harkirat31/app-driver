@@ -62,6 +62,35 @@ class ApiService {
     });
   }
 
+Future<bool> resetPassword(String email) {
+    return Future(() {
+      return http
+          .post(Uri.parse('${BASE_URL}auth/resetPassword'),
+              headers: {
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode({"email": email}))
+          .timeout(const Duration(seconds: REQUEST_WAIT_TIME), onTimeout: () {
+        throw Exception();
+      }).then((value) async {
+        Map<String, dynamic> result =
+            jsonDecode(value.body) as Map<String, dynamic>;
+        if (result['reset'] != null) {
+          if(result['reset']){
+            return true;
+          }else{
+            return false;
+          }
+        } else {
+            throw GenericException();
+        }
+      }).catchError((error, stackTrace) {
+        throw GenericException();
+      });
+    });
+  }
+
+
   Future<List<DriverCompany>> getDriverCompanyListWithDate(DateTime date) {
     return Future(() {
       return SharedPreferences.getInstance().then((value) {

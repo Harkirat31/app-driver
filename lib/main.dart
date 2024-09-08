@@ -1,5 +1,6 @@
 import 'package:drivers/firebase_options.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
+import 'package:drivers/views/forgot_password.dart';
 import 'package:drivers/views/init.dart';
 import 'package:drivers/views/landing.dart';
 import 'package:drivers/views/map_view.dart';
@@ -48,7 +49,8 @@ class _MyAppState extends State<MyApp> {
           '/signIn': (context) => const SignIn(),
           '/init': (context) =>  const Init(),
           '/orderInfo': (context) => const OrderInfo(),
-          '/mapView': (context) => PathMapView()
+          '/mapView': (context) => PathMapView(),
+          '/forgot':(context) => const ForgotPassword()
         },
         home: const Init());
   }

@@ -24,6 +24,44 @@ class _OrderInfoState extends State<OrderInfo> {
     super.didChangeDependencies();
   }
 
+  Future<void> launchPhoneDialer(String phoneNumber) async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
+    // canLaunchUrl(phoneUri).then((value){
+    //   print(value);
+    // }).catchError((error){
+    //    print("Printing Error :");
+    //    print(error);
+    // });
+    if (Platform.isAndroid) {
+      await launchUrl(phoneUri);
+    } else {
+      if (await canLaunchUrl(phoneUri)) {
+        await launchUrl(phoneUri);
+      } else {
+        throw 'Could not launch $phoneNumber';
+      }
+    }
+  }
+
+  Widget orderDetailRow(String key,String value,[Widget? widget]) {
+    return Padding(
+      padding: const EdgeInsets.all(6.0),
+      child: Wrap(
+        children: [
+           Text(
+            "$key : ",
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          widget??Text(value),
+        ],
+      ),
+    );
+  }
+
+  Widget getSpacing(){
+    return   SizedBox(height: 1,child: Container(color: Colors.grey,));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -31,113 +69,80 @@ class _OrderInfoState extends State<OrderInfo> {
         title: const Text("Order Info"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Wrap(
-            children: [
-              const Text(
-                "Date : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.deliveryDate.toString().substring(0, 11)),
-            ],
+        padding: const EdgeInsets.all(16.0),
+        child: DefaultTextStyle(
+          style: const TextStyle(
+            fontSize: 16, // Set the desired font size here
+            color: Colors.black,
+             // You can also set other text properties
           ),
-          Wrap(
-            children: [
-              const Text(
-                "Order Id : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.orderNumber ?? "N/A"),
-            ],
-          ),
-          Wrap(
-            children: [
-              const Text(
-                "Name : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.cname),
-            ],
-          ),
-          Wrap(
-            children: [
-              const Text(
-                "Address : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.address),
-            ],
-          ),
-          Wrap(
-            children: [
-              const Text(
-                "Priority : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.priority),
-            ],
-          ),
-          Wrap(
-            children: [
-              const Text(
-                "Details : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.itemsDetail ?? "No details provided"),
-            ],
-          ),
-          Wrap(
-            children: [
-              const Text(
-                "Instructions : ",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Text(order!.specialInstructions ?? "No instructions"),
-            ],
-          ),
-          order!.currentStatus != "Delivered"
-              ? Center(
-                  child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          LoadingScreen()
-                              .show(context: context, text: "Please Wait ..");
-                          ApiService()
-                              .markDelivered(order!.orderId!)
-                              .then((value) {
-                            LoadingScreen().hide();
-                          }).onError((error, stackTrace) {
-                            LoadingScreen().hide();
-                          });
-                          order!.currentStatus = "Delivered";
-                          context.read<DriverCompanyProvider>().updateData();
-                        });
-                      },
-                      child: const Text("Mark as Delivered")))
-              : const Wrap(
-                  children: [
-                    Text(
-                      "Current Status : ",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      "Delivered",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.green),
-                    ),
-                  ],
-                ),
-          Center(
-              child: ElevatedButton(
-                  onPressed: () async {
-                    if (order!.location != null) {
-                      await launchGoogleMaps(
-                          order!.location!.lat, order!.location!.lng);
-                    }
-                  },
-                  child: const Text("Open Google Maps Navigation"))),
-        ]),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                orderDetailRow("Date",order!.deliveryDate.toString().substring(0, 11)),
+               getSpacing(),
+                orderDetailRow("Order Id",order!.orderNumber ?? "N/A" ),
+                getSpacing(),
+                orderDetailRow("Name", order!.cname),
+                getSpacing(),
+                orderDetailRow("Phone", order!.cphone,),
+                getSpacing(),
+                orderDetailRow("Address", order!.address),
+                getSpacing(),
+                orderDetailRow("Priority", order!.priority),
+                getSpacing(),
+                orderDetailRow("Details",order!.itemsDetail ?? "No details provided" ),
+                getSpacing(),
+                orderDetailRow("Instructions",order!.specialInstructions ?? "No instructions" ),
+                getSpacing(),
+                order!.currentStatus != "Delivered"
+                    ? Center(
+                        child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                LoadingScreen().show(
+                                    context: context, text: "Please Wait ..");
+                                ApiService()
+                                    .markDelivered(order!.orderId!)
+                                    .then((value) {
+                                  LoadingScreen().hide();
+                                }).onError((error, stackTrace) {
+                                  LoadingScreen().hide();
+                                });
+                                order!.currentStatus = "Delivered";
+                                context
+                                    .read<DriverCompanyProvider>()
+                                    .updateData();
+                              });
+                            },
+                            child: const Text("Mark as Delivered")))
+                    : orderDetailRow(
+                        "Current Status",
+                        "Delivered",
+                        const Text(
+                          "Delivered",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.green),
+                        )),
+                     
+                Center(
+                    child: ElevatedButton(
+                        onPressed: () async {
+                          if (order!.location != null) {
+                            await launchGoogleMaps(
+                                order!.location!.lat, order!.location!.lng);
+                          }
+                        },
+                        child: const Text("Open Maps Navigation"))),
+                Center(
+                    child: ElevatedButton(
+                        onPressed: () {
+                          launchPhoneDialer(order!.cphone);
+                        },
+                        child: const Text("Call"))),
+              ]),
+        ),
       ),
     );
   }
