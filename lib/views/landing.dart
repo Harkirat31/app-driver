@@ -19,6 +19,8 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
   late List<DriverCompany> driverCompanies;
   int? selectedCompanyIndex;
   late DateTime selectedDate;
+  late List<DateTime> futureDates;
+  
 
   @override
   void initState() {
@@ -37,9 +39,14 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
 
   void refresh() {
     LoadingScreen().show(context: context, text: "Refreshing..");
-    ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
-      context.read<DriverCompanyProvider>().refresh(value);
-      LoadingScreen().hide();
+    ApiService().getFuturePathDates(DateTime.now()).then((futureDates) {
+      context.read<DriverCompanyProvider>().updateFutureDeliveryDates(futureDates);
+      ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
+        context.read<DriverCompanyProvider>().refresh(value);
+        LoadingScreen().hide();
+      }).onError((error, stackTrace) {
+        LoadingScreen().hide();
+      });
     }).onError((error, stackTrace) {
       LoadingScreen().hide();
     });
@@ -47,6 +54,7 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
 
   void changeDate() {
     LoadingScreen().show(context: context, text: "Refreshing..");
+    
     ApiService().getDriverCompanyListWithDate(selectedDate).then((value) {
       context.read<DriverCompanyProvider>().refresh(value);
       LoadingScreen().hide();
@@ -66,7 +74,8 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
   void didChangeDependencies() {
     driverCompanies = context.watch<DriverCompanyProvider>().driverCompanies;
     selectedDate = context.watch<DriverCompanyProvider>().selectedDate;
-    selectedCompanyIndex = driverCompanies.isNotEmpty ? 0 : null;
+    futureDates = context.watch<DriverCompanyProvider>().futureDeliveryDates;
+    selectedCompanyIndex = driverCompanies.isNotEmpty ? context.watch<DriverCompanyProvider>().selectedCompanyIndex: null;
     super.didChangeDependencies();
   }
 
@@ -85,22 +94,82 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
     }
   }
 
+  bool weatherDatesEqual(DateTime first, DateTime second){
+    if(first.toString().substring(0,11)==second.toString().substring(0,11)){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  Widget getUpcomingDeliveries(){
+    int futureBoxes = 0;
+    if(futureDates.length>2){
+      futureBoxes = 3;
+    }else if(futureDates.length>1) {
+      futureBoxes=2;
+    }
+    else if(futureDates.isNotEmpty){
+      futureBoxes=1;
+    }
+    
+    return Wrap(
+      alignment: WrapAlignment.start,
+      children: [
+        for (int i = 0; i < futureBoxes; i++)
+            Padding(
+              padding: const EdgeInsets.only(right: 4),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    selectedDate = futureDates[i];
+                    context.read<DriverCompanyProvider>().updateDate(futureDates[i]);
+                    changeDate();
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: weatherDatesEqual(selectedDate,futureDates[i])?Colors.blue[900]:Colors.blue,
+                  ),
+                
+                  child: Text(futureDates[i].toString().substring(0, 11).split(' ')[0],style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold),),
+                ),
+              ),
+            ),
+         GestureDetector(
+                onTap: (){
+                  _selectDate(context);
+                },
+                child: Container(
+                   padding: const EdgeInsets.symmetric(horizontal: 4,vertical: 8),
+                   decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(8)
+                   ),
+              
+                  child: const Text("Custom Date",style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),))
+                )
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     DropdownButton getCompaniesDropdown() {
       return DropdownButton(
-        isExpanded: true,
         hint: const Text('Select Company'),
         items:
             driverCompanies.asMap().entries.map<DropdownMenuItem<int>>((item) {
           return DropdownMenuItem(
             value: item.key,
-            child: Text(item.value.companyName ?? "N/A"),
-          );
+            child: SizedBox(width: 180,child: Text(item.value.companyName?? "N/A",style: const TextStyle(overflow: TextOverflow.ellipsis),)));
         }).toList(),
         onChanged: (value) {
           setState(() {
-            selectedCompanyIndex = value!;
+          selectedCompanyIndex = value!;
+          context.read<DriverCompanyProvider>().updateSelectedCompanyIndex(value);
           });
         },
         value: selectedCompanyIndex,
@@ -114,40 +183,36 @@ class _LandingState extends State<Landing> with WidgetsBindingObserver {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(children: [
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            const SizedBox(
+              height: 2.0,
+            ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  "Date : ",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text("${selectedDate.toLocal()}".split(' ')[0]),
-                const SizedBox(
-                  width: 10.0,
-                ),
-                ElevatedButton(
-                  onPressed: () => _selectDate(context),
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.circular(12), // Rounded corners
-                    ),
-                    textStyle: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold, // Font weight
-                    ),
-                  ),
-                   child: const Text('Change date'),
-                ),
+                const Text("UPCOMING DELIVERIES",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),),
+                driverCompanies.isNotEmpty
+                    ? getCompaniesDropdown()
+                    : const Text("Nothing Assigned"),
               ],
             ),
+                
+
             const SizedBox(
-              height: 10.0,
-            ),
-            driverCompanies.isNotEmpty
-                ? getCompaniesDropdown()
-                : const Text("Nothing Assigned"),
+                  height: 8.0,
+                ),
+
+            getUpcomingDeliveries(),
+            const SizedBox(
+                  height: 10.0,
+                ),
+            Row(children: [
+              const Text("Selected Date : ",style: TextStyle(color: Colors.blue,fontWeight: FontWeight.bold),),
+              Text(selectedDate.toString().substring(0,11),style: const TextStyle(fontWeight: FontWeight.bold),),
+             
+            ],),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

@@ -9,6 +9,7 @@ class Path {
   bool? show;
   String? driverId;
   String? driverName;
+  bool? isAcceptedByDriver;
   Path(
       {this.path,
       this.pathId,
@@ -16,7 +17,8 @@ class Path {
       this.dateOfPath,
       this.companyId,
       this.driverId,
-      this.driverName});
+      this.driverName,
+      this.isAcceptedByDriver});
   factory Path.fromJson(Map<String, dynamic> json) {
     return Path(
         pathId: json['pathId'],
@@ -24,6 +26,8 @@ class Path {
         //show: bool.parse(json['show']),
         companyId: json['companyId'],
         driverId: json['driverId'],
-        driverName: json['driverName']);
+        driverName: json['driverName'],
+        isAcceptedByDriver:  json['isAcceptedByDriver']
+        );
   }
 }

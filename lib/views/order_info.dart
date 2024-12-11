@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:drivers/helper/dialog_box.dart';
 import 'package:drivers/helper/loading/loading_screen.dart';
 import 'package:drivers/model/order.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
@@ -26,12 +27,6 @@ class _OrderInfoState extends State<OrderInfo> {
 
   Future<void> launchPhoneDialer(String phoneNumber) async {
     final Uri phoneUri = Uri(scheme: 'tel', path: phoneNumber);
-    // canLaunchUrl(phoneUri).then((value){
-    //   print(value);
-    // }).catchError((error){
-    //    print("Printing Error :");
-    //    print(error);
-    // });
     if (Platform.isAndroid) {
       await launchUrl(phoneUri);
     } else {
@@ -48,11 +43,11 @@ class _OrderInfoState extends State<OrderInfo> {
       padding: const EdgeInsets.all(6.0),
       child: Wrap(
         children: [
-           Text(
+           SelectableText(
             "$key : ",
             style: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          widget??Text(value),
+          widget??SelectableText(value),
         ],
       ),
     );
@@ -99,7 +94,9 @@ class _OrderInfoState extends State<OrderInfo> {
                 order!.currentStatus != "Delivered"
                     ? Center(
                         child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              bool result = await  showConfirmationDialog(context);
+                              if(result){
                               setState(() {
                                 LoadingScreen().show(
                                     context: context, text: "Please Wait ..");
@@ -114,7 +111,7 @@ class _OrderInfoState extends State<OrderInfo> {
                                 context
                                     .read<DriverCompanyProvider>()
                                     .updateData();
-                              });
+                              });}
                             },
                             child: const Text("Mark as Delivered")))
                     : orderDetailRow(

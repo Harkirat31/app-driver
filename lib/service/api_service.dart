@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:math';
 import 'package:drivers/config.dart';
 import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
+import 'package:drivers/helper/dateHelper.dart';
 import 'package:drivers/model/driver_company.dart';
 import 'package:drivers/model/order.dart';
 import 'package:drivers/model/path.dart';
@@ -20,7 +22,9 @@ class ApiService {
               "Authorization": "Bearer $jwtToken",
             },
             body: jsonEncode({"FCMToken": fcmToken}))
-        .then((value) => value)).catchError((err) {});
+        .then((value) => value)).catchError((err) {
+          throw GenericException();
+        });
   }
 
   Future<bool> signIn(String email, String password) {
@@ -122,18 +126,25 @@ Future<bool> resetPassword(String email) {
             }
 
             for (Map<String, dynamic> pathJson in paths) {
-              Path path = Path.fromJson(pathJson);
-              List<Order> orders = [];
-              List<dynamic> ordersInPath = pathJson['path'] as List<dynamic>;
-              for (String orderId in ordersInPath) {
-                orders.add(allOrders[orderId]!);
+              try {
+                Path path = Path.fromJson(pathJson);
+                List<Order> orders = [];
+                List<dynamic> ordersInPath = pathJson['path'] as List<dynamic>;
+                for (String orderId in ordersInPath) {
+                  orders.add(allOrders[orderId]!);
+                }
+                path.path = orders;
+                if (allPaths.containsKey(path.companyId!)) {
+                  allPaths[path.companyId!]!.add(path);
+                } else {
+                  allPaths[path.companyId!] = [path];
+                }
+              } catch (e) {
+                //if there is parsing Error in Path.fromJson
+                print(e);
               }
-              path.path = orders;
-              if (allPaths.containsKey(path.companyId!)) {
-                allPaths[path.companyId!]!.add(path);
-              } else {
-                allPaths[path.companyId!] = [path];
-              }
+             
+             
             }
 
             for (Map<String, dynamic> element in arrayDriverCompany) {
@@ -143,7 +154,6 @@ Future<bool> resetPassword(String email) {
             }
             return allDriverCompany;
           }).catchError((error) {
-            print(error);
             if (error != null) {
               throw error;
             } else {
@@ -275,4 +285,96 @@ Future<bool> resetPassword(String email) {
       });
     });
   }
+
+
+   Future<List<DateTime>> getFuturePathDates(DateTime date) {
+    return Future(() {
+      return SharedPreferences.getInstance().then((value) {
+        String? token = value.getString("token");
+        if (token != null) {
+          return http
+              .post(Uri.parse('${BASE_URL}driver/getFuturePathDates'),
+                  headers: {
+                    "Authorization": "Bearer $token",
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(
+                      {"date": DateTime.utc(date.year,date.month,date.day).toString() }))
+              .timeout(const Duration(seconds: REQUEST_WAIT_TIME),
+                  onTimeout: () {
+            throw Exception();
+          }).then((value) {
+            List<dynamic> result =
+                jsonDecode(value.body) as List<dynamic>;
+                List<DateTime> tempDates = [];
+                for (final d in result){
+                  tempDates.add(getDateFromString(d));
+                }
+              return tempDates;
+            
+          }).onError((error, stackTrace) {
+            if (error != null) {
+              throw error;
+            } else {
+              throw GenericException();
+            }
+          });
+        } else {
+          throw UserNotLogin();
+        }
+      }).onError((error, stackTrace) {
+        if (error != null) {
+          throw error;
+        }
+        throw GenericException();
+      });
+    });
+  }
+
+ Future<bool> markAcceptedOrRejected(String pathId,bool action) {
+    return Future(() {
+      return SharedPreferences.getInstance().then((value) {
+        String? token = value.getString("token");
+        if (token != null) {
+          return http
+              .post(Uri.parse('${BASE_URL}driver/updatePathAcceptanceByDriver'),
+                  headers: {
+                    "Authorization": "Bearer $token",
+                    'Content-Type': 'application/json; charset=UTF-8',
+                  },
+                  body: jsonEncode(
+                      {"pathId": pathId, "isAcceptedByDriver": action}))
+              .timeout(const Duration(seconds: REQUEST_WAIT_TIME),
+                  onTimeout: () {
+            throw Exception();
+          }).then((value) {
+            Map<String, dynamic> result =
+                jsonDecode(value.body) as Map<String, dynamic>;
+            if (result['isUpdated'] == true) {
+              return true;
+            } else {
+              throw GenericException();
+            }
+          }).onError((error, stackTrace) {
+            if (error != null) {
+              throw error;
+            } else {
+              throw GenericException();
+            }
+          });
+        } else {
+          throw UserNotLogin();
+        }
+      }).onError((error, stackTrace) {
+        if (error != null) {
+          throw error;
+        }
+        throw GenericException();
+      });
+    });
+  }
+
+
 }
+
+

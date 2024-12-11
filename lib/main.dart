@@ -32,13 +32,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Deliveries For Drivers',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
           appBarTheme: const AppBarTheme(
-              color: Colors.blue,
+              color:Colors.blue,
               titleTextStyle: TextStyle(
                   color: Colors.white,
                   fontSize: 16,

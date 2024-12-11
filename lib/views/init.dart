@@ -1,3 +1,4 @@
+import 'package:drivers/exception/Exceptions.dart/app_exceptions.dart';
 import 'package:drivers/provider/driver_company_provider.dart';
 import 'package:drivers/service/api_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -20,14 +21,24 @@ class _InitState extends State<Init> {
         //dave FCM Token in db backend
         handleFCM(value.getString("token")!);
         // fetch data and populate Providers
-
-        ApiService().getDriverCompanyListWithDate(DateTime.now()).then((value) {
+        DateTime date  = DateTime.now();
+        ApiService().getFuturePathDates(DateTime.now()).then((futureDates){
+          context.read<DriverCompanyProvider>().updateFutureDeliveryDates(futureDates);
+          if(futureDates.isNotEmpty){
+            date = futureDates[0];
+            context.read<DriverCompanyProvider>().updateDate(date);
+          }
+          ApiService().getDriverCompanyListWithDate(date).then((value) {
           context.read<DriverCompanyProvider>().addDriverCompantList(value);
           Navigator.of(context)
               .pushNamedAndRemoveUntil('/landing', (route) => false);
         }).onError((error, stackTrace) {
           Navigator.of(context)
               .pushNamedAndRemoveUntil('/signIn', (route) => false);
+        });
+        }).catchError((e){
+          Navigator.of(context)
+            .pushNamedAndRemoveUntil('/signIn', (route) => false);
         });
       } else {
         Navigator.of(context)
@@ -57,13 +68,16 @@ Future<void> saveTokenToDatabase(String jwtToken) async {
     if (token != null) {
       await ApiService().saveFCMToken(token, jwtToken);
     }
-  } catch (e) {}
+  } catch (e) {
+    throw GenericException();
+  }
 }
 
 void handleFCM(String jwtToken) async {
-  await saveTokenToDatabase(jwtToken);
-  NotificationSettings settings =
-      await FirebaseMessaging.instance.requestPermission(
+  try{
+    await saveTokenToDatabase(jwtToken);
+    NotificationSettings settings =
+    await FirebaseMessaging.instance.requestPermission(
     alert: true,
     announcement: false,
     badge: true,
@@ -73,4 +87,8 @@ void handleFCM(String jwtToken) async {
     sound: true,
   );
   FirebaseMessaging.instance.onTokenRefresh.listen(saveTokenToDatabase);
+  }catch(e){
+    print(e.toString());
+  }
+ 
 }
